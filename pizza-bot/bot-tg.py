@@ -1,11 +1,12 @@
 from handlers import client, admin, other
 from aiogram.utils import executor
 from create_bot import dp
+from database import sqlite_db
 
 
 async def on_startup(_):
     print('bot is running')
-
+    sqlite_db.sql_start()
 
 client.register_handlers_client(dp)
 admin.register_handlers_admin(dp)

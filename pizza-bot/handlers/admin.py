@@ -4,6 +4,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from create_bot import dp, bot
 from aiogram.dispatcher.filters import Text
+from database import sqlite_db
+from keyboards import admin_kb
 
 
 ID = None
@@ -23,7 +25,7 @@ class FSMAdmin(StatesGroup):
 async def make_changes_command(message: types.Message):
     global ID
     ID = message.from_user.id
-    await bot.send_message(message.from_user.id, 'Waiting for the command...')
+    await bot.send_message(message.from_user.id, 'Waiting for the command...', reply_markup=admin_kb.button_case_admin)
     await message.delete()
 
 
@@ -82,8 +84,7 @@ async def load_price(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['price'] = float(message.text)
 
-        async with state.proxy() as data:
-            await message.reply(str(data))
+        await sqlite_db.sql_add_command(state)
         await state.finish()
 
 
