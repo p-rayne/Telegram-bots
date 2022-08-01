@@ -2,6 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from create_bot import dp
+from aiogram.dispatcher.filters import Text
 
 
 class FSMAdmin(StatesGroup):
@@ -56,6 +57,17 @@ async def load_price(message: types.Message, state: FSMContext):
     await state.finish()
 
 
+# state exit
+# @dp.message_handler(state="*", commands='cancel')
+# @dp.message_handler(Text(equals='cancel', ignore_case=True), state="*")
+async def cancel_handler(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    await state.finish()
+    await message.reply('ok')
+
+
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(cm_start, commands=['Upload'], state=None)
     dp.register_message_handler(load_photo, content_types=[
@@ -63,3 +75,6 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(load_name, state=FSMAdmin.name)
     dp.register_message_handler(load_description, state=FSMAdmin.description)
     dp.register_message_handler(load_price, state=FSMAdmin.price)
+    dp.register_message_handler(cancel_handler, state="*", commands='cancel')
+    dp.register_message_handler(cancel_handler, Text(
+        equals='cancel', ignore_case=True), state="*")
